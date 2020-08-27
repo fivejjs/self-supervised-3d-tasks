@@ -1,14 +1,14 @@
-from self_supervised_3d_tasks.data.numpy_2d_loader import Numpy2DLoader
-from self_supervised_3d_tasks.utils.model_utils import init, print_flat_summary
 from pathlib import Path
 
 import tensorflow.keras as keras
-from self_supervised_3d_tasks.data.numpy_3d_loader import DataGeneratorUnlabeled3D
 
-from self_supervised_3d_tasks.data.make_data_generator import get_data_generators
-from self_supervised_3d_tasks.data.image_2d_loader import DataGeneratorUnlabeled2D
 from self_supervised_3d_tasks.algorithms import cpc, jigsaw, relative_patch_location, rotation, exemplar
+from self_supervised_3d_tasks.data.image_2d_loader import DataGeneratorUnlabeled2D
+from self_supervised_3d_tasks.data.make_data_generator import get_data_generators
+from self_supervised_3d_tasks.data.numpy_2d_loader import Numpy2DLoader
+from self_supervised_3d_tasks.data.numpy_3d_loader import DataGeneratorUnlabeled3D
 from self_supervised_3d_tasks.utils.model_utils import get_writing_path
+from self_supervised_3d_tasks.utils.model_utils import init, print_flat_summary
 
 keras_algorithm_list = {
     "cpc": cpc,
@@ -53,14 +53,17 @@ def train_model(algorithm, data_dir, dataset_name, root_config_file, epochs=250,
     algorithm_def = keras_algorithm_list[algorithm].create_instance(**kwargs)
 
     f_train, f_val = algorithm_def.get_training_preprocessing()
-    train_data, validation_data = get_dataset(data_dir, batch_size, f_train, f_val, train_val_split, dataset_name, **kwargs)
+    train_data, validation_data = get_dataset(data_dir, batch_size, f_train, f_val, train_val_split, dataset_name,
+                                              **kwargs)
     model = algorithm_def.get_training_model()
     print_flat_summary(model)
 
     tb_c = keras.callbacks.TensorBoard(log_dir=str(working_dir))
-    mc_c = keras.callbacks.ModelCheckpoint(str(working_dir / "weights-improvement-{epoch:03d}.hdf5"), monitor="val_loss",
+    mc_c = keras.callbacks.ModelCheckpoint(str(working_dir / "weights-improvement-{epoch:03d}.hdf5"),
+                                           monitor="val_loss",
                                            mode="min", save_best_only=True)  # reduce storage space
-    mc_c_epochs = keras.callbacks.ModelCheckpoint(str(working_dir / "weights-{epoch:03d}.hdf5"), period=save_checkpoint_every_n_epochs)  # reduce storage space
+    mc_c_epochs = keras.callbacks.ModelCheckpoint(str(working_dir / "weights-{epoch:03d}.hdf5"),
+                                                  period=save_checkpoint_every_n_epochs)  # reduce storage space
     callbacks = [tb_c, mc_c, mc_c_epochs]
 
     # Trains the model
@@ -73,8 +76,10 @@ def train_model(algorithm, data_dir, dataset_name, root_config_file, epochs=250,
         callbacks=callbacks
     )
 
+
 def main():
     init(train_model)
+
 
 if __name__ == "__main__":
     main()
