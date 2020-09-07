@@ -1,21 +1,26 @@
-from self_supervised_3d_tasks.data.kaggle_retina_data import get_kaggle_generator, get_kaggle_cross_validation
+from self_supervised_3d_tasks.data.kaggle_retina_data import (
+    get_kaggle_generator,
+    get_kaggle_cross_validation,
+)
 from self_supervised_3d_tasks.data.make_data_generator import get_data_generators
 from self_supervised_3d_tasks.data.numpy_2d_loader import Numpy2DLoader
-from self_supervised_3d_tasks.data.segmentation_task_loader import SegmentationGenerator3D
+from self_supervised_3d_tasks.data.segmentation_task_loader import (
+    SegmentationGenerator3D,
+)
 import numpy as np
 
 
 def get_dataset_regular_train(
-        batch_size,
-        f_train,
-        f_val,
-        train_split,
-        data_generator,
-        data_dir_train,
-        val_split=0.1,
-        train_data_generator_args={},
-        val_data_generator_args={},
-        **kwargs,
+    batch_size,
+    f_train,
+    f_val,
+    train_split,
+    data_generator,
+    data_dir_train,
+    val_split=0.1,
+    train_data_generator_args={},
+    val_data_generator_args={},
+    **kwargs,
 ):
     train_split = train_split * (1 - val_split)  # normalize train split
 
@@ -38,13 +43,13 @@ def get_dataset_regular_train(
 
 
 def get_dataset_regular_test(
-        batch_size,
-        f_test,
-        data_generator,
-        data_dir_test,
-        train_data_generator_args={},
-        test_data_generator_args={},
-        **kwargs,
+    batch_size,
+    f_test,
+    data_generator,
+    data_dir_test,
+    train_data_generator_args={},
+    test_data_generator_args={},
+    **kwargs,
 ):
     if "val_split" in kwargs:
         del kwargs["val_split"]
@@ -61,16 +66,16 @@ def get_dataset_regular_test(
 
 
 def get_dataset_kaggle_train_original(
-        batch_size,
-        f_train,
-        f_val,
-        train_split,
-        csv_file_train,
-        data_dir,
-        val_split=0.1,
-        train_data_generator_args={},
-        val_data_generator_args={},
-        **kwargs,
+    batch_size,
+    f_train,
+    f_val,
+    train_split,
+    csv_file_train,
+    data_dir,
+    val_split=0.1,
+    train_data_generator_args={},
+    val_data_generator_args={},
+    **kwargs,
 ):
     train_split = train_split * (1 - val_split)  # normalize train split
     train_data_generator, val_data_generator, _ = get_kaggle_generator(
@@ -92,13 +97,13 @@ def get_dataset_kaggle_train_original(
 
 
 def get_dataset_kaggle_test(
-        batch_size,
-        f_test,
-        csv_file_test,
-        data_dir,
-        train_data_generator_args={},  # DO NOT remove
-        test_data_generator_args={},
-        **kwargs,
+    batch_size,
+    f_test,
+    csv_file_test,
+    data_dir,
+    train_data_generator_args={},  # DO NOT remove
+    test_data_generator_args={},
+    **kwargs,
 ):
     if "val_split" in kwargs:
         del kwargs["val_split"]
@@ -144,13 +149,27 @@ def get_dataset_train(dataset_name, batch_size, f_train, f_val, train_split, kwa
         return get_dataset_kaggle_train_original(
             batch_size, f_train, f_val, train_split, **kwargs
         )
-    elif dataset_name == "pancreas3d" or dataset_name == 'brats' or dataset_name == 'ukb3d':
+    elif (
+        dataset_name == "pancreas3d"
+        or dataset_name == "brats"
+        or dataset_name == "ukb3d"
+    ):
         return get_dataset_regular_train(
-            batch_size, f_train, f_val, train_split, data_generator=SegmentationGenerator3D, **kwargs,
+            batch_size,
+            f_train,
+            f_val,
+            train_split,
+            data_generator=SegmentationGenerator3D,
+            **kwargs,
         )
     elif dataset_name == "pancreas2d":
         return get_dataset_regular_train(
-            batch_size, f_train, f_val, train_split, data_generator=Numpy2DLoader, **kwargs,
+            batch_size,
+            f_train,
+            f_val,
+            train_split,
+            data_generator=Numpy2DLoader,
+            **kwargs,
         )
     else:
         raise ValueError("not implemented")
@@ -159,13 +178,20 @@ def get_dataset_train(dataset_name, batch_size, f_train, f_val, train_split, kwa
 def get_dataset_test(dataset_name, batch_size, f_test, kwargs):
     if dataset_name == "kaggle_retina":
         gen_test = get_dataset_kaggle_test(batch_size, f_test, **kwargs)
-    elif dataset_name == "pancreas3d" or dataset_name == 'brats' or dataset_name == 'ukb3d':
+    elif (
+        dataset_name == "pancreas3d"
+        or dataset_name == "brats"
+        or dataset_name == "ukb3d"
+    ):
         gen_test = get_dataset_regular_test(
             batch_size, f_test, data_generator=SegmentationGenerator3D, **kwargs
         )
     elif dataset_name == "pancreas2d":
         gen_test = get_dataset_regular_test(
-            batch_size, f_test, data_generator=Numpy2DLoader, **kwargs,
+            batch_size,
+            f_test,
+            data_generator=Numpy2DLoader,
+            **kwargs,
         )
     else:
         raise ValueError("not implemented")
@@ -174,8 +200,7 @@ def get_dataset_test(dataset_name, batch_size, f_test, kwargs):
 
 
 class StandardDataLoader:
-    def __init__(self, dataset_name, batch_size, algorithm_def,
-                 **kwargs):
+    def __init__(self, dataset_name, batch_size, algorithm_def, **kwargs):
         self.algorithm_def = algorithm_def
         self.batch_size = batch_size
         self.dataset_name = dataset_name
@@ -188,44 +213,56 @@ class StandardDataLoader:
             self.dataset_name, self.batch_size, f_train, f_val, train_split, self.kwargs
         )
 
-        x_test, y_test = get_dataset_test(self.dataset_name, self.batch_size, f_val, self.kwargs)
+        x_test, y_test = get_dataset_test(
+            self.dataset_name, self.batch_size, f_val, self.kwargs
+        )
         return gen_train, gen_val, x_test, y_test
 
 
 class CvDataKaggle:
-    def __init__(self, dataset_name, batch_size, algorithm_def,
-                 n_repetitions,
-                 csv_file,
-                 data_dir,
-                 val_split=0.1,
-                 test_data_generator_args={},
-                 val_data_generator_args={},
-                 train_data_generator_args={},
-                 **kwargs):
+    def __init__(
+        self,
+        dataset_name,
+        batch_size,
+        algorithm_def,
+        n_repetitions,
+        csv_file,
+        data_dir,
+        val_split=0.1,
+        test_data_generator_args={},
+        val_data_generator_args={},
+        train_data_generator_args={},
+        **kwargs,
+    ):
         assert dataset_name == "kaggle_retina", "CV only implemented for kaggle so far"
 
         f_train, f_val = algorithm_def.get_finetuning_preprocessing()
-        self.cv = get_kaggle_cross_validation(data_path=data_dir, csv_file=csv_file,
-                                              k_fold=n_repetitions,
-                                              train_data_generator_args={
-                                                  **{"batch_size": batch_size, "pre_proc_func": f_train},
-                                                  **train_data_generator_args,
-                                              },
-                                              val_data_generator_args={
-                                                  **{"batch_size": batch_size, "pre_proc_func": f_val},
-                                                  **val_data_generator_args,
-                                              },
-                                              test_data_generator_args={
-                                                  **{"batch_size": batch_size, "pre_proc_func": f_val},
-                                                  **test_data_generator_args,
-                                              }, **kwargs)
+        self.cv = get_kaggle_cross_validation(
+            data_path=data_dir,
+            csv_file=csv_file,
+            k_fold=n_repetitions,
+            train_data_generator_args={
+                **{"batch_size": batch_size, "pre_proc_func": f_train},
+                **train_data_generator_args,
+            },
+            val_data_generator_args={
+                **{"batch_size": batch_size, "pre_proc_func": f_val},
+                **val_data_generator_args,
+            },
+            test_data_generator_args={
+                **{"batch_size": batch_size, "pre_proc_func": f_val},
+                **test_data_generator_args,
+            },
+            **kwargs,
+        )
         self.val_split = val_split
 
     def get_dataset(self, repetition, train_split):
         train_split = train_split * (1 - self.val_split)  # normalize train split
 
-        gen_train, gen_val, gen_test = self.cv.make_generators(test_chunk=repetition, train_split=train_split,
-                                                               val_split=self.val_split)
+        gen_train, gen_val, gen_test = self.cv.make_generators(
+            test_chunk=repetition, train_split=train_split, val_split=self.val_split
+        )
 
         x_test, y_test = get_data_from_gen(gen_test)
         return gen_train, gen_val, x_test, y_test

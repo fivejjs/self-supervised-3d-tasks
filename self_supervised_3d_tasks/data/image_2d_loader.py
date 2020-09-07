@@ -6,20 +6,23 @@ from self_supervised_3d_tasks.data.generator_base import DataGeneratorBase
 
 
 class DataGeneratorUnlabeled2D(DataGeneratorBase):
-
-    def __init__(self,
-                 data_path,
-                 file_list,
-                 batch_size=32,
-                 shuffle=False,
-                 pre_proc_func=None,
-                 augment=False,
-                 augment_zoom_only=False):
+    def __init__(
+        self,
+        data_path,
+        file_list,
+        batch_size=32,
+        shuffle=False,
+        pre_proc_func=None,
+        augment=False,
+        augment_zoom_only=False,
+    ):
         self.augment_zoom_only = augment_zoom_only
         self.augment = augment
         self.path_to_data = data_path
 
-        super(DataGeneratorUnlabeled2D, self).__init__(file_list, batch_size, shuffle, pre_proc_func)
+        super(DataGeneratorUnlabeled2D, self).__init__(
+            file_list, batch_size, shuffle, pre_proc_func
+        )
 
     def data_generation(self, list_files_temp):
         data_x = []
@@ -34,11 +37,25 @@ class DataGeneratorUnlabeled2D(DataGeneratorBase):
                 img /= 255
 
                 if self.augment_zoom_only:
-                    img = random_zoom(img, zoom_range=(0.85, 1.15), channel_axis=2, row_axis=0, col_axis=1,
-                                      fill_mode='constant', cval=0.0)
+                    img = random_zoom(
+                        img,
+                        zoom_range=(0.85, 1.15),
+                        channel_axis=2,
+                        row_axis=0,
+                        col_axis=1,
+                        fill_mode="constant",
+                        cval=0.0,
+                    )
                 elif self.augment:
-                    img = random_zoom(img, zoom_range=(0.85, 1.15), channel_axis=2, row_axis=0, col_axis=1,
-                                        fill_mode='constant', cval=0.0)
+                    img = random_zoom(
+                        img,
+                        zoom_range=(0.85, 1.15),
+                        channel_axis=2,
+                        row_axis=0,
+                        col_axis=1,
+                        fill_mode="constant",
+                        cval=0.0,
+                    )
                     img = ab.HorizontalFlip()(image=img)["image"]
                     img = ab.VerticalFlip()(image=img)["image"]
 

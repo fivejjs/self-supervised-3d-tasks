@@ -10,7 +10,7 @@ from tensorflow.keras.layers import (
     UpSampling3D,
     Input,
     concatenate,
-    AveragePooling3D
+    AveragePooling3D,
 )
 from tensorflow.keras.models import Model
 from tensorflow.keras.utils import plot_model
@@ -25,14 +25,14 @@ def upsample_simple_3d(filters, kernel_size, strides, padding):
 
 
 def conv3d_block(
-        inputs,
-        use_batch_norm=True,
-        dropout=0.3,
-        filters=16,
-        kernel_size=(3, 3, 3),
-        activation="relu",
-        kernel_initializer="he_normal",
-        padding="same",
+    inputs,
+    use_batch_norm=True,
+    dropout=0.3,
+    filters=16,
+    kernel_size=(3, 3, 3),
+    activation="relu",
+    kernel_initializer="he_normal",
+    padding="same",
 ):
     c = Conv3D(
         filters,
@@ -58,14 +58,14 @@ def conv3d_block(
 
 
 def downconv_model_3d(
-        input_shape,
-        use_batch_norm=True,
-        dropout=0.5,
-        dropout_change_per_layer=0.0,
-        filters=16,
-        num_layers=4,
-        pooling=None,
-        **kwargs
+    input_shape,
+    use_batch_norm=True,
+    dropout=0.5,
+    dropout_change_per_layer=0.0,
+    filters=16,
+    num_layers=4,
+    pooling=None,
+    **kwargs
 ):
     inputs = Input(input_shape)
     x = inputs
@@ -92,18 +92,19 @@ def downconv_model_3d(
     model = Model(inputs=[inputs], outputs=[x])
     return model, [down_layers, filters]
 
+
 def upconv_model_3d(
-        input_shape,
-        num_classes=3,
-        use_batch_norm=True,
-        upsample_mode="deconv",  # 'deconv' or 'simple'
-        use_dropout_on_upsampling=True,
-        dropout=0.5,
-        dropout_change_per_layer=0.0,
-        filters=128,
-        down_layers=(),
-        output_activation="softmax",  # 'sigmoid' or 'softmax'
-        **kwargs
+    input_shape,
+    num_classes=3,
+    use_batch_norm=True,
+    upsample_mode="deconv",  # 'deconv' or 'simple'
+    use_dropout_on_upsampling=True,
+    dropout=0.5,
+    dropout_change_per_layer=0.0,
+    filters=128,
+    down_layers=(),
+    output_activation="softmax",  # 'sigmoid' or 'softmax'
+    **kwargs
 ):
     inp = Input(input_shape)
     inputs = [inp]
@@ -131,16 +132,16 @@ def upconv_model_3d(
 
 
 def custom_unet_3d(
-        input_shape,
-        num_classes=1,
-        use_batch_norm=True,
-        upsample_mode="deconv",  # 'deconv' or 'simple'
-        use_dropout_on_upsampling=False,
-        dropout=0.3,
-        dropout_change_per_layer=0.0,
-        filters=16,
-        num_layers=4,
-        output_activation="sigmoid",  # 'sigmoid' or 'softmax'
+    input_shape,
+    num_classes=1,
+    use_batch_norm=True,
+    upsample_mode="deconv",  # 'deconv' or 'simple'
+    use_dropout_on_upsampling=False,
+    dropout=0.3,
+    dropout_change_per_layer=0.0,
+    filters=16,
+    num_layers=4,
+    output_activation="sigmoid",  # 'sigmoid' or 'softmax'
 ):
     downconv, data = downconv_model_3d(
         input_shape,
@@ -149,7 +150,7 @@ def custom_unet_3d(
         dropout_change_per_layer=dropout_change_per_layer,
         filters=filters,
         num_layers=num_layers,
-        pooling="avg"
+        pooling="avg",
     )
     upconv = upconv_model_3d(
         downconv.layers[-1].output_shape[1:],

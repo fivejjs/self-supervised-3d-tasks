@@ -15,8 +15,12 @@ def resize_one(path, size=(224, 224), output_dir="resized"):
 
 
 def resize_images():
-    basepath = Path("/mnt/projects/ukbiobank/derived/imaging/retinal_fundus/mixed_images")
-    output_dir = Path("/mnt/projects/ukbiobank/derived/imaging/retinal_fundus/images_resized_224")
+    basepath = Path(
+        "/mnt/projects/ukbiobank/derived/imaging/retinal_fundus/mixed_images"
+    )
+    output_dir = Path(
+        "/mnt/projects/ukbiobank/derived/imaging/retinal_fundus/images_resized_224"
+    )
     output_dir.mkdir(exist_ok=True, parents=True)
     f = partial(resize_one, output_dir=output_dir)
     num_cores = cpu_count()

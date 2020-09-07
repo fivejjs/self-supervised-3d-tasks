@@ -10,21 +10,24 @@ from self_supervised_3d_tasks.utils.model_utils import (
 )
 from self_supervised_3d_tasks.utils.metrics import triplet_loss
 from self_supervised_3d_tasks.preprocessing.preprocess_exemplar import (
-    get_exemplar_training_preprocessing)
+    get_exemplar_training_preprocessing,
+)
 
 
 class ExemplarBuilder(AlgorithmBuilderBase):
     def __init__(
-            self,
-            data_dim=384,
-            number_channels=3,
-            data_is_3D=False,
-            code_size=1024,
-            lr=1e-4,
-            sample_neg_examples_from="batch",
-            **kwargs
+        self,
+        data_dim=384,
+        number_channels=3,
+        data_is_3D=False,
+        code_size=1024,
+        lr=1e-4,
+        sample_neg_examples_from="batch",
+        **kwargs
     ):
-        super(ExemplarBuilder, self).__init__(data_dim, number_channels, lr, data_is_3D, **kwargs)
+        super(ExemplarBuilder, self).__init__(
+            data_dim, number_channels, lr, data_is_3D, **kwargs
+        )
 
         self.sample_neg_examples_from = sample_neg_examples_from
         self.dim = (
@@ -51,9 +54,15 @@ class ExemplarBuilder(AlgorithmBuilderBase):
             input_layer
         )
 
-        encoded_a = Dense(self.code_size, activation="sigmoid")(Flatten()(self.enc_model(anchor_input)))
-        encoded_p = Dense(self.code_size, activation="sigmoid")(Flatten()(self.enc_model(positive_input)))
-        encoded_n = Dense(self.code_size, activation="sigmoid")(Flatten()(self.enc_model(negative_input)))
+        encoded_a = Dense(self.code_size, activation="sigmoid")(
+            Flatten()(self.enc_model(anchor_input))
+        )
+        encoded_p = Dense(self.code_size, activation="sigmoid")(
+            Flatten()(self.enc_model(positive_input))
+        )
+        encoded_n = Dense(self.code_size, activation="sigmoid")(
+            Flatten()(self.enc_model(negative_input))
+        )
         encoded_a = Reshape((1, self.code_size))(encoded_a)
         encoded_p = Reshape((1, self.code_size))(encoded_p)
         encoded_n = Reshape((1, self.code_size))(encoded_n)
@@ -69,8 +78,11 @@ class ExemplarBuilder(AlgorithmBuilderBase):
         return model
 
     def get_training_preprocessing(self):
-        f = get_exemplar_training_preprocessing(self.data_is_3D, self.sample_neg_examples_from)
+        f = get_exemplar_training_preprocessing(
+            self.data_is_3D, self.sample_neg_examples_from
+        )
         return f, f
+
 
 def create_instance(*params, **kwargs):
     return ExemplarBuilder(*params, **kwargs)

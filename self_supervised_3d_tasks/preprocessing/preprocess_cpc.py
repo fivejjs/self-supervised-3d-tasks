@@ -2,11 +2,21 @@ import numpy as np
 import albumentations as ab
 from math import sqrt
 
-from self_supervised_3d_tasks.preprocessing.utils.crop import crop, crop_patches, crop_patches_3d, crop_3d
-from self_supervised_3d_tasks.preprocessing.utils.pad import pad_to_final_size_2d, pad_to_final_size_3d
+from self_supervised_3d_tasks.preprocessing.utils.crop import (
+    crop,
+    crop_patches,
+    crop_patches_3d,
+    crop_3d,
+)
+from self_supervised_3d_tasks.preprocessing.utils.pad import (
+    pad_to_final_size_2d,
+    pad_to_final_size_3d,
+)
 
 
-def preprocess_image(image, patch_jitter, patches_per_side, crop_size, is_training=True):
+def preprocess_image(
+    image, patch_jitter, patches_per_side, crop_size, is_training=True
+):
     result = []
     w, h, _ = image.shape
 
@@ -34,10 +44,19 @@ def preprocess_2d(batch, crop_size, patches_per_side, is_training=True):
     _, w, h, _ = batch.shape
     assert w == h, "accepting only squared images"
 
-    patch_jitter = int(- w / (patches_per_side + 1))  # overlap half of the patch size
-    return np.array([preprocess_image(image=image, patch_jitter=patch_jitter,
-                                      patches_per_side=patches_per_side, crop_size=crop_size,
-                                      is_training=is_training) for image in batch])
+    patch_jitter = int(-w / (patches_per_side + 1))  # overlap half of the patch size
+    return np.array(
+        [
+            preprocess_image(
+                image=image,
+                patch_jitter=patch_jitter,
+                patches_per_side=patches_per_side,
+                crop_size=crop_size,
+                is_training=is_training,
+            )
+            for image in batch
+        ]
+    )
 
 
 def preprocess_grid_2d(image):
@@ -122,7 +141,9 @@ def preprocess_grid_2d(image):
         for col_index in range(patch_size):
             # positive example
             terms = get_patches_for(batch_index, end_patch_index, col_index)
-            predict_terms = get_following_patches(batch_index, end_patch_index + 2, col_index)
+            predict_terms = get_following_patches(
+                batch_index, end_patch_index + 2, col_index
+            )
             patches_enc.append(np.stack(terms))
             patches_pred.append(np.stack(predict_terms))
             labels.append(1)
@@ -143,7 +164,9 @@ def preprocess_grid_2d(image):
     return [np.stack(patches_enc), np.stack(patches_pred)], np.array(labels)
 
 
-def preprocess_volume_3d(volume, crop_size, patches_per_side, patch_overlap, is_training=True):
+def preprocess_volume_3d(
+    volume, crop_size, patches_per_side, patch_overlap, is_training=True
+):
     result = []
     w, _, _, _ = volume.shape
 
@@ -160,7 +183,9 @@ def preprocess_volume_3d(volume, crop_size, patches_per_side, patch_overlap, is_
             if do_flip:
                 patch = np.flip(patch, 0)
 
-            patch = crop_3d(patch, is_training, (patch_crop_size, patch_crop_size, patch_crop_size))
+            patch = crop_3d(
+                patch, is_training, (patch_crop_size, patch_crop_size, patch_crop_size)
+            )
             patch = pad_to_final_size_3d(patch, normal_patch_size)
 
         else:
@@ -176,8 +201,18 @@ def preprocess_3d(batch, crop_size, patches_per_side, is_training=True):
     assert w == h and h == d, "accepting only cube volumes"
 
     patch_overlap = 0  # dont use overlap here
-    return np.stack([preprocess_volume_3d(volume, crop_size, patches_per_side, patch_overlap, is_training=is_training)
-                     for volume in batch])
+    return np.stack(
+        [
+            preprocess_volume_3d(
+                volume,
+                crop_size,
+                patches_per_side,
+                patch_overlap,
+                is_training=is_training,
+            )
+            for volume in batch
+        ]
+    )
 
 
 def preprocess_grid_3d(image, skip_row=False):
@@ -229,7 +264,9 @@ def preprocess_grid_3d(image, skip_row=False):
             else:
                 return None
 
-        return image[batch, x * n_patches_one_dim * n_patches_one_dim + y * n_patches_one_dim + z]
+        return image[
+            batch, x * n_patches_one_dim * n_patches_one_dim + y * n_patches_one_dim + z
+        ]
 
     # this function will collect all the patches at one x-level that should be used in the terms
     # in comparison to the x_start, we know how far we have to expand, forming a pyramid in 3D
@@ -246,7 +283,9 @@ def preprocess_grid_3d(image, skip_row=False):
                 patches.append(get_patch_at(batch, x, y, z, mirror=True))
 
         if x > 0:
-            patches = get_patches_in_row(batch, x - 1, x_start, y_start, z_start) + patches
+            patches = (
+                get_patches_in_row(batch, x - 1, x_start, y_start, z_start) + patches
+            )
 
         return patches
 
@@ -263,15 +302,23 @@ def preprocess_grid_3d(image, skip_row=False):
         others = [me] + get_following_patches(batch, x + 1, y, z)
         return others
 
-    end_patch_index = int(n_patches_one_dim / 2) - 1  # this is the last index of the terms
-    start_pred_patch_index = end_patch_index + 2 if skip_row else end_patch_index + 1  # skipping row or not
+    end_patch_index = (
+        int(n_patches_one_dim / 2) - 1
+    )  # this is the last index of the terms
+    start_pred_patch_index = (
+        end_patch_index + 2 if skip_row else end_patch_index + 1
+    )  # skipping row or not
 
     for batch_index in range(batch_size):
         for col_index in range(n_patches_one_dim):
             for depth_index in range(n_patches_one_dim):
                 # positive example
-                terms = get_patches_for(batch_index, end_patch_index, col_index, depth_index)
-                predict_terms = get_following_patches(batch_index, start_pred_patch_index, col_index, depth_index)
+                terms = get_patches_for(
+                    batch_index, end_patch_index, col_index, depth_index
+                )
+                predict_terms = get_following_patches(
+                    batch_index, start_pred_patch_index, col_index, depth_index
+                )
                 patches_enc.append(np.stack(terms))
                 patches_pred.append(np.stack(predict_terms))
                 labels.append(1)
@@ -281,12 +328,18 @@ def preprocess_grid_3d(image, skip_row=False):
                 r_col = col_index
                 r_dep = depth_index
 
-                while r_batch == batch_index and r_col == col_index and r_dep == depth_index:
+                while (
+                    r_batch == batch_index
+                    and r_col == col_index
+                    and r_dep == depth_index
+                ):
                     r_batch = np.random.randint(batch_size)
                     r_col = np.random.randint(n_patches_one_dim)
                     r_dep = np.random.randint(n_patches_one_dim)
 
-                predict_terms = get_following_patches(r_batch, start_pred_patch_index, r_col, r_dep)
+                predict_terms = get_following_patches(
+                    r_batch, start_pred_patch_index, r_col, r_dep
+                )
                 patches_enc.append(np.stack(terms))
                 patches_pred.append(np.stack(predict_terms))
                 labels.append(0)

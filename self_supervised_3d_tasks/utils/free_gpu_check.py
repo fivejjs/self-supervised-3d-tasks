@@ -14,7 +14,7 @@ def aquire_free_gpus(amount=1, use_gpu=None, **kwargs):
     print("GPU usage:\n{}".format(gpu_df))
     gpu_df["memory.free"] = gpu_df["memory.free"].map(lambda x: int(x.rstrip(" [MiB]")))
     gpu_df["memory.used"] = gpu_df["memory.used"].map(lambda x: int(x.rstrip(" [MiB]")))
-    gpu_df['number'] = range(len(gpu_df))
+    gpu_df["number"] = range(len(gpu_df))
 
     gpu_df = gpu_df.sort_values(
         by=["memory.used", "memory.free"], ascending=[True, False]

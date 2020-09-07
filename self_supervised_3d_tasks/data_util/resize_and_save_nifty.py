@@ -27,7 +27,9 @@ def split_slices_to_single_files():
 
         for i in range(source.shape[2]):
             slice = source[:, :, i, :]
-            np.save("{}/{}".format(result_path, "slice" + str(result_index) + ".npy"), slice)
+            np.save(
+                "{}/{}".format(result_path, "slice" + str(result_index) + ".npy"), slice
+            )
             result_index += 1
 
         perc = (float(x) * 100.0) / len(list_files_temp)
@@ -54,7 +56,7 @@ def data_generation_self_supervised_pancreas_2D_slices():
 
             result = np.expand_dims(img, axis=3)
 
-            file_name = file_name[:file_name.index('.')] + ".npy"
+            file_name = file_name[: file_name.index(".")] + ".npy"
             np.save("{}/{}".format(result_path, file_name), result)
 
             perc = (float(i) * 100.0) / len(list_files_temp)
@@ -68,7 +70,9 @@ def data_generation_self_supervised_pancreas_2D_slices():
 
 def data_generation_pancreas_2D_slices():
     result_path = "/home/Shared.Workspace/pancreas_data/images_slices_128_labeled/img"
-    result_path_label = "/home/Shared.Workspace/pancreas_data/images_slices_128_labeled/img_label"
+    result_path_label = (
+        "/home/Shared.Workspace/pancreas_data/images_slices_128_labeled/img_label"
+    )
     path_to_data = "/mnt/mpws2019cl1/Task07_Pancreas/imagesTr"
     path_to_labels = "/mnt/mpws2019cl1/Task07_Pancreas/labelsTr"
 
@@ -90,7 +94,7 @@ def data_generation_pancreas_2D_slices():
             label = label.get_fdata()
 
             img, bb = read_scan_find_bbox(img)
-            label = label[bb[0]:bb[1], bb[2]:bb[3], bb[4]:bb[5]]
+            label = label[bb[0] : bb[1], bb[2] : bb[3], bb[4] : bb[5]]
 
             dim = dim_2d + (img.shape[2],)
             img = skTrans.resize(img, dim, order=1, preserve_range=True)
@@ -99,7 +103,7 @@ def data_generation_pancreas_2D_slices():
             result = np.expand_dims(img, axis=3)
             label_result = np.expand_dims(label, axis=3)
 
-            file_name = file_name[:file_name.index('.')] + ".npy"
+            file_name = file_name[: file_name.index(".")] + ".npy"
             np.save("{}/{}".format(result_path, file_name), result)
             np.save("{}/{}".format(result_path_label, file_name), label_result)
 
@@ -133,7 +137,7 @@ def data_generation_pancreas():
             label = label.get_fdata()
 
             img, bb = read_scan_find_bbox(img)
-            label = label[bb[0]:bb[1], bb[2]:bb[3], bb[4]:bb[5]]
+            label = label[bb[0] : bb[1], bb[2] : bb[3], bb[4] : bb[5]]
 
             img = skTrans.resize(img, dim, order=1, preserve_range=True)
             label = skTrans.resize(label, dim, order=1, preserve_range=True)
@@ -141,8 +145,8 @@ def data_generation_pancreas():
             result = np.expand_dims(img, axis=3)
             label_result = np.expand_dims(label, axis=3)
 
-            file_name = file_name[:file_name.index('.')] + ".npy"
-            label_file_name = file_name[:file_name.index('.')] + "_label.npy"
+            file_name = file_name[: file_name.index(".")] + ".npy"
+            label_file_name = file_name[: file_name.index(".")] + "_label.npy"
             np.save("{}/{}".format(result_path, file_name), result)
             np.save("{}/{}".format(result_path, label_file_name), label_result)
 
@@ -160,8 +164,17 @@ def data_conversion_ukb():
     destination_path = "/mnt/30T/ukbiobank/derived/imaging/brain_mri/"
     new_resolution = (128, 128, 128)
 
-    t1_zip_files = sorted(glob.glob(source_path + "T1_structural_brain_mri/archive/**/*.zip", recursive=True))
-    t2_zip_files = sorted(glob.glob(source_path + "T2_FLAIR_structural_brain_mri/archive/**/*.zip", recursive=True))
+    t1_zip_files = sorted(
+        glob.glob(
+            source_path + "T1_structural_brain_mri/archive/**/*.zip", recursive=True
+        )
+    )
+    t2_zip_files = sorted(
+        glob.glob(
+            source_path + "T2_FLAIR_structural_brain_mri/archive/**/*.zip",
+            recursive=True,
+        )
+    )
 
     t2_flair_patient_ids = dict()
     for filename in t2_zip_files:
@@ -175,24 +188,36 @@ def data_conversion_ukb():
         if subject_id in t2_flair_patient_ids:  # ensure we have a scan in t2 too
             count += 1
             try:
-                t1_archive = zipfile.ZipFile(t1_zip_file, 'r')
-                t1_extracted_path = t1_archive.extract('T1/T1.nii.gz')
+                t1_archive = zipfile.ZipFile(t1_zip_file, "r")
+                t1_extracted_path = t1_archive.extract("T1/T1.nii.gz")
                 nif_file = nib.load(t1_extracted_path)
                 t1_scan = nif_file.get_fdata()
-                t1_extracted_path = t1_archive.extract('T1/T1_brain_mask.nii.gz')
+                t1_extracted_path = t1_archive.extract("T1/T1_brain_mask.nii.gz")
                 nif_file = nib.load(t1_extracted_path)
                 t1_mask = np.asarray(nif_file.get_fdata(), dtype=np.bool)
                 t1_scan[~t1_mask] = t1_scan.min()
-                t1_scan = skTrans.resize(t1_scan, new_resolution, order=1, preserve_range=True)
-                np.save(os.path.join(destination_path, "T1", str(subject_id) + ".npy"), t1_scan)
+                t1_scan = skTrans.resize(
+                    t1_scan, new_resolution, order=1, preserve_range=True
+                )
+                np.save(
+                    os.path.join(destination_path, "T1", str(subject_id) + ".npy"),
+                    t1_scan,
+                )
 
-                t2_archive = zipfile.ZipFile(t2_flair_patient_ids[subject_id], 'r')
-                t2_extracted_path = t2_archive.extract('T2_FLAIR/T2_FLAIR.nii.gz')
+                t2_archive = zipfile.ZipFile(t2_flair_patient_ids[subject_id], "r")
+                t2_extracted_path = t2_archive.extract("T2_FLAIR/T2_FLAIR.nii.gz")
                 nif_file = nib.load(t2_extracted_path)
                 t2_scan = nif_file.get_fdata()
                 t2_scan[~t1_mask] = t2_scan.min()
-                t2_scan = skTrans.resize(t2_scan, new_resolution, order=1, preserve_range=True)
-                np.save(os.path.join(destination_path, "T2_FLAIR", str(subject_id) + ".npy"), t2_scan)
+                t2_scan = skTrans.resize(
+                    t2_scan, new_resolution, order=1, preserve_range=True
+                )
+                np.save(
+                    os.path.join(
+                        destination_path, "T2_FLAIR", str(subject_id) + ".npy"
+                    ),
+                    t2_scan,
+                )
                 del t1_scan, t2_scan
             except Exception:
                 print(t1_zip_file)
@@ -202,15 +227,15 @@ def data_conversion_ukb():
             print("Processed " + str(count) + " scans so far.")
 
 
-def data_conversion_brats(split='train'):
+def data_conversion_brats(split="train"):
     """
     :param split: can be 'train' or 'val'
     """
     new_resolution = (128, 128, 128)
-    train_path = '/mnt/30T/brats/train/**/'
-    validation_path = '/mnt/30T/brats/test/**/'
+    train_path = "/mnt/30T/brats/train/**/"
+    validation_path = "/mnt/30T/brats/test/**/"
     result_path = "/mnt/30T/brats/images_resized_128_labeled"
-    if split == 'train':
+    if split == "train":
         path = train_path
     else:
         path = validation_path
@@ -225,10 +250,13 @@ def data_conversion_brats(split='train'):
 
     num_cores = multiprocessing.cpu_count()
     results = Parallel(n_jobs=num_cores)(
-        delayed(read_mm_slice_brats)(flair_files, i, seg_files, t1_files, t1ce_files, t2_files, new_resolution) for i in
-        range(len(t1_files)))
+        delayed(read_mm_slice_brats)(
+            flair_files, i, seg_files, t1_files, t1ce_files, t2_files, new_resolution
+        )
+        for i in range(len(t1_files))
+    )
     for i, item in enumerate(results):
-        file_name = os.path.basename(t1ce_files[i]).replace('_t1ce.nii.gz', '')
+        file_name = os.path.basename(t1ce_files[i]).replace("_t1ce.nii.gz", "")
         scan_file_name = file_name + ".npy"
         mask_file_name = file_name + "_label.npy"
         np.save("{}/{}".format(result_path, scan_file_name), item[0])
@@ -238,11 +266,19 @@ def data_conversion_brats(split='train'):
         print(f"{perc:.2f} % done")
 
 
-def read_mm_slice_brats(flair_files, i, seg_files, t1_files, t1ce_files, t2_files, new_resolution):
-    t1ce_image, nbbox = read_scan_find_bbox(nib.load(t1ce_files[i]).get_fdata(), normalize=False)
-    t1ce_image = skTrans.resize(t1ce_image, new_resolution, order=1, preserve_range=True)
+def read_mm_slice_brats(
+    flair_files, i, seg_files, t1_files, t1ce_files, t2_files, new_resolution
+):
+    t1ce_image, nbbox = read_scan_find_bbox(
+        nib.load(t1ce_files[i]).get_fdata(), normalize=False
+    )
+    t1ce_image = skTrans.resize(
+        t1ce_image, new_resolution, order=1, preserve_range=True
+    )
     flair_image = read_scan(nbbox, nib.load(flair_files[i]))
-    flair_image = skTrans.resize(flair_image, new_resolution, order=1, preserve_range=True)
+    flair_image = skTrans.resize(
+        flair_image, new_resolution, order=1, preserve_range=True
+    )
     t1_image = read_scan(nbbox, nib.load(t1_files[i]))
     t1_image = skTrans.resize(t1_image, new_resolution, order=1, preserve_range=True)
     t2_image = read_scan(nbbox, nib.load(t2_files[i]))
@@ -256,25 +292,32 @@ def read_mm_slice_brats(flair_files, i, seg_files, t1_files, t1ce_files, t2_file
 
 
 def read_scan(sbbox, nif_file):
-    return nif_file.get_fdata()[sbbox[0]:sbbox[1], sbbox[2]:sbbox[3], sbbox[4]:sbbox[5]]
+    return nif_file.get_fdata()[
+        sbbox[0] : sbbox[1], sbbox[2] : sbbox[3], sbbox[4] : sbbox[5]
+    ]
 
 
 def preprocess_ukb_3D_multimodal():
     base_path = "/mnt/30T/ukbiobank/derived/imaging/brain_mri/"
     result_path = "/mnt/30T/ukbiobank/derived/imaging/brain_mri/images_resized_128"
     t1_files = np.array(sorted(glob.glob(base_path + "/T1/**/*.npy", recursive=True)))
-    t2_flair_files = np.array(sorted(glob.glob(base_path + "/T2_FLAIR/**/*.npy", recursive=True)))
+    t2_flair_files = np.array(
+        sorted(glob.glob(base_path + "/T2_FLAIR/**/*.npy", recursive=True))
+    )
 
     num_cores = multiprocessing.cpu_count()
     Parallel(n_jobs=num_cores)(
-        delayed(read_ukb_scan_multimodal)(t1_files, t2_flair_files, i, result_path) for i in
-        range(len(t2_flair_files)))
+        delayed(read_ukb_scan_multimodal)(t1_files, t2_flair_files, i, result_path)
+        for i in range(len(t2_flair_files))
+    )
     print("done preprocessing images")
 
 
 def read_ukb_scan_multimodal(t1_files, t2_flair_files, i, result_path):
     t1_scan, sbbox = read_scan_find_bbox(np.load(t1_files[i]))
-    t2_flair_scan = np.load(t2_flair_files[i])[sbbox[0]:sbbox[1], sbbox[2]:sbbox[3], sbbox[4]:sbbox[5]]
+    t2_flair_scan = np.load(t2_flair_files[i])[
+        sbbox[0] : sbbox[1], sbbox[2] : sbbox[3], sbbox[4] : sbbox[5]
+    ]
     stacked_array = np.stack([t1_scan, t2_flair_scan], axis=-1)
     scan_file_name = os.path.basename(t1_files[i])
     np.save("{}/{}".format(result_path, scan_file_name), stacked_array)
@@ -299,8 +342,9 @@ def resize_ukb_3D_masks():
 
     num_cores = multiprocessing.cpu_count()
     Parallel(n_jobs=num_cores)(
-        delayed(resize_ukb_mask)(mask_files, i, result_path) for i in
-        range(len(mask_files)))
+        delayed(resize_ukb_mask)(mask_files, i, result_path)
+        for i in range(len(mask_files))
+    )
     print("done preprocessing masks.")
 
 
@@ -319,14 +363,19 @@ def stack_ukb_scan_multimodal(t1_files, t2_flair_files, i, result_path):
 
 def stack_ukb_3D_modalities():
     base_path = "/mnt/projects/ukbiobank/derived/imaging/brain_mri"
-    result_path = "/mnt/projects/ukbiobank/derived/imaging/brain_mri/images_resized_128_labeled"
+    result_path = (
+        "/mnt/projects/ukbiobank/derived/imaging/brain_mri/images_resized_128_labeled"
+    )
     t1_files = np.array(sorted(glob.glob(base_path + "/T1/**/*.npy", recursive=True)))
-    t2_flair_files = np.array(sorted(glob.glob(base_path + "/T2_FLAIR/**/*.npy", recursive=True)))
+    t2_flair_files = np.array(
+        sorted(glob.glob(base_path + "/T2_FLAIR/**/*.npy", recursive=True))
+    )
 
     num_cores = multiprocessing.cpu_count()
     Parallel(n_jobs=num_cores)(
-        delayed(stack_ukb_scan_multimodal)(t1_files, t2_flair_files, i, result_path) for i in
-        range(len(t2_flair_files)))
+        delayed(stack_ukb_scan_multimodal)(t1_files, t2_flair_files, i, result_path)
+        for i in range(len(t2_flair_files))
+    )
     print("done preprocessing images")
 
 

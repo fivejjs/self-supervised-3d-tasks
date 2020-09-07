@@ -1,17 +1,13 @@
 from tensorflow.python.keras import Model
 from tensorflow.python.keras.layers.pooling import Pooling3D, Pooling2D
-from self_supervised_3d_tasks.utils.model_utils import make_finetuning_encoder_3d, make_finetuning_encoder_2d
+from self_supervised_3d_tasks.utils.model_utils import (
+    make_finetuning_encoder_3d,
+    make_finetuning_encoder_2d,
+)
 
 
 class AlgorithmBuilderBase:
-    def __init__(
-            self,
-            data_dim,
-            number_channels,
-            lr,
-            data_is_3D,
-            **kwargs
-    ):
+    def __init__(self, data_dim, number_channels, lr, data_is_3D, **kwargs):
         self.data_dim = data_dim
         self.number_channels = number_channels
         self.lr = lr
@@ -61,7 +57,8 @@ class AlgorithmBuilderBase:
                 outputs=[
                     self.enc_model.layers[-1].output,
                     *reversed(self.layer_data[0]),
-                ])
+                ],
+            )
 
         return self.enc_model
 
@@ -80,7 +77,12 @@ class AlgorithmBuilderBase:
 
         if self.data_is_3D:
             new_enc, self.layer_data = make_finetuning_encoder_3d(
-                (self.data_dim, self.data_dim, self.data_dim, self.number_channels,),
+                (
+                    self.data_dim,
+                    self.data_dim,
+                    self.data_dim,
+                    self.number_channels,
+                ),
                 self.enc_model,
                 **self.kwargs
             )
@@ -88,7 +90,11 @@ class AlgorithmBuilderBase:
             return new_enc
         else:
             new_enc, self.layer_data = make_finetuning_encoder_2d(
-                (self.data_dim, self.data_dim, self.number_channels,),
+                (
+                    self.data_dim,
+                    self.data_dim,
+                    self.number_channels,
+                ),
                 self.enc_model,
                 **self.kwargs
             )

@@ -3,29 +3,33 @@ from tensorflow.keras.layers import TimeDistributed, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
 
 from self_supervised_3d_tasks.algorithms.algorithm_base import AlgorithmBuilderBase
-from self_supervised_3d_tasks.preprocessing.preprocess_jigsaw import (
-    preprocess)
+from self_supervised_3d_tasks.preprocessing.preprocess_jigsaw import preprocess
 from self_supervised_3d_tasks.utils.model_utils import (
     apply_encoder_model,
     apply_encoder_model_3d,
     load_permutations,
     load_permutations_3d,
-    apply_prediction_model, make_finetuning_encoder_3d, make_finetuning_encoder_2d)
+    apply_prediction_model,
+    make_finetuning_encoder_3d,
+    make_finetuning_encoder_2d,
+)
 
 
 class JigsawBuilder(AlgorithmBuilderBase):
     def __init__(
-            self,
-            data_dim=384,
-            patches_per_side=3,
-            patch_jitter=0,
-            number_channels=3,
-            lr=1e-4,
-            data_is_3D=False,
-            top_architecture="big_fully",
-            **kwargs
+        self,
+        data_dim=384,
+        patches_per_side=3,
+        patch_jitter=0,
+        number_channels=3,
+        lr=1e-4,
+        data_is_3D=False,
+        top_architecture="big_fully",
+        **kwargs
     ):
-        super(JigsawBuilder, self).__init__(data_dim, number_channels, lr, data_is_3D, **kwargs)
+        super(JigsawBuilder, self).__init__(
+            data_dim, number_channels, lr, data_is_3D, **kwargs
+        )
 
         self.top_architecture = top_architecture
         self.patches_per_side = patches_per_side
@@ -49,7 +53,12 @@ class JigsawBuilder(AlgorithmBuilderBase):
                 )
             )
             self.enc_model, _ = apply_encoder_model_3d(
-                (self.patch_dim, self.patch_dim, self.patch_dim, self.number_channels,),
+                (
+                    self.patch_dim,
+                    self.patch_dim,
+                    self.patch_dim,
+                    self.number_channels,
+                ),
                 **self.kwargs
             )
         else:
@@ -59,7 +68,12 @@ class JigsawBuilder(AlgorithmBuilderBase):
                 (self.n_patches, self.patch_dim, self.patch_dim, self.number_channels)
             )
             self.enc_model, _ = apply_encoder_model(
-                (self.patch_dim, self.patch_dim, self.number_channels,), **self.kwargs
+                (
+                    self.patch_dim,
+                    self.patch_dim,
+                    self.number_channels,
+                ),
+                **self.kwargs
             )
 
         x = TimeDistributed(self.enc_model)(input_x)

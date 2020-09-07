@@ -2,16 +2,20 @@ import numpy as np
 import random
 import tensorflow.keras as keras
 
-from self_supervised_3d_tasks.data.preproc_negative_sampling import NegativeSamplingPreprocessing
+from self_supervised_3d_tasks.data.preproc_negative_sampling import (
+    NegativeSamplingPreprocessing,
+)
 
 
 class DataGeneratorBase(keras.utils.Sequence):
-    def __init__(self,
-                 file_list,
-                 batch_size,
-                 shuffle,
-                 pre_proc_func,
-                 use_realistic_batch_size=True):
+    def __init__(
+        self,
+        file_list,
+        batch_size,
+        shuffle,
+        pre_proc_func,
+        use_realistic_batch_size=True,
+    ):
         super(DataGeneratorBase, self).__init__()
 
         self.use_realistic_batch_size = use_realistic_batch_size
@@ -23,6 +27,7 @@ class DataGeneratorBase(keras.utils.Sequence):
         self.pre_proc_func = pre_proc_func
 
         if isinstance(self.pre_proc_func, NegativeSamplingPreprocessing):
+
             def neg_sampling(positive_ids):
                 neg_ids = [e for e in self.list_IDs if e not in positive_ids]
                 idx = np.random.randint(len(neg_ids))
@@ -36,7 +41,9 @@ class DataGeneratorBase(keras.utils.Sequence):
 
     def get_multiplicator(self):
         # check how many examples preprocess produces for one file
-        self.index_multiplicator = DataGeneratorBase.get_batch_size(self.__data_generation_intern([self.list_IDs[0]])[0])
+        self.index_multiplicator = DataGeneratorBase.get_batch_size(
+            self.__data_generation_intern([self.list_IDs[0]])[0]
+        )
         assert self.index_multiplicator > 0, "invalid preprocessing"
 
     def __len__(self):
@@ -46,7 +53,9 @@ class DataGeneratorBase(keras.utils.Sequence):
         if self.index_multiplicator is None:
             self.get_multiplicator()
 
-        return int(np.ceil((len(self.list_IDs) * self.index_multiplicator) / self.batch_size))
+        return int(
+            np.ceil((len(self.list_IDs) * self.index_multiplicator) / self.batch_size)
+        )
 
     @staticmethod
     def get_batch_size(x):
@@ -119,7 +128,9 @@ class DataGeneratorBase(keras.utils.Sequence):
 
         if self.pre_proc_func:
             if isinstance(self.pre_proc_func, NegativeSamplingPreprocessing):
-                data_x, data_y = self.pre_proc_func.preprocess_function(list_files_temp, data_x, data_y)
+                data_x, data_y = self.pre_proc_func.preprocess_function(
+                    list_files_temp, data_x, data_y
+                )
             else:
                 data_x, data_y = self.pre_proc_func(data_x, data_y)
 

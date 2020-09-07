@@ -2,11 +2,19 @@ import random
 
 import numpy as np
 
-from self_supervised_3d_tasks.preprocessing.utils.crop import crop_patches, crop_patches_3d
-from self_supervised_3d_tasks.preprocessing.utils.pad import pad_to_final_size_3d, pad_to_final_size_2d
+from self_supervised_3d_tasks.preprocessing.utils.crop import (
+    crop_patches,
+    crop_patches_3d,
+)
+from self_supervised_3d_tasks.preprocessing.utils.pad import (
+    pad_to_final_size_3d,
+    pad_to_final_size_2d,
+)
 
 
-def preprocess_image(image, is_training, patches_per_side, patch_jitter, permutations, mode3d):
+def preprocess_image(
+    image, is_training, patches_per_side, patch_jitter, permutations, mode3d
+):
     label = random.randint(0, len(permutations) - 1)
 
     if mode3d:
@@ -20,12 +28,16 @@ def preprocess_image(image, is_training, patches_per_side, patch_jitter, permuta
     return np.array(patches)[np.array(permutations[label])], np.array(b)
 
 
-def preprocess(batch, patches_per_side, patch_jitter, permutations, is_training=True, mode3d=False):
+def preprocess(
+    batch, patches_per_side, patch_jitter, permutations, is_training=True, mode3d=False
+):
     xs = []
     ys = []
 
     for image in batch:
-        x, y = preprocess_image(image, is_training, patches_per_side, patch_jitter, permutations, mode3d)
+        x, y = preprocess_image(
+            image, is_training, patches_per_side, patch_jitter, permutations, mode3d
+        )
         xs.append(x)
         ys.append(y)
 

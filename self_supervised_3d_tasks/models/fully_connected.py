@@ -2,9 +2,7 @@ from tensorflow.keras.layers import BatchNormalization, Dropout, Dense
 from tensorflow.python.keras.layers import GlobalAveragePooling2D
 
 
-def fully_connected(
-        inputs, num_classes=100, rate=0.5, include_top=True
-):
+def fully_connected(inputs, num_classes=100, rate=0.5, include_top=True):
     net = inputs
 
     net = Dense(512, activation="relu")(net)
@@ -27,7 +25,7 @@ def simple_multiclass(inputs, dropout_rate=0.5, include_top=True, **kwargs):
     net = Dropout(rate=dropout_rate)(net)
 
     if include_top:
-        net = Dense(5, activation='sigmoid')(net)
+        net = Dense(5, activation="sigmoid")(net)
 
     return net
 

@@ -7,6 +7,7 @@ import nibabel as nib
 import numpy as np
 import pandas as pd
 import skimage.transform as skTrans
+
 # import skimage.transform as skTrans
 import tensorflow as tf
 import tensorflow.keras as keras
@@ -22,8 +23,9 @@ resolution3D = (128, 128, 128)
 def parallel_load_ukb_multimodal(t1_files, t2_flair_files):
     num_cores = multiprocessing.cpu_count()
     results = Parallel(n_jobs=num_cores)(
-        delayed(read_ukb_scan_multimodal)(t1_files, t2_flair_files, i, resize=True) for i in
-        range(len(t2_flair_files)))
+        delayed(read_ukb_scan_multimodal)(t1_files, t2_flair_files, i, resize=True)
+        for i in range(len(t2_flair_files))
+    )
     print("done loading images, gathering them in one array now.")
     all_slices = list()
     for mm_scan in results:
@@ -40,8 +42,9 @@ def parallel_load_ukb_multimodal(t1_files, t2_flair_files):
 def parallel_load_ukb_3D_multimodal(t1_files, t2_flair_files):
     num_cores = multiprocessing.cpu_count()
     results = Parallel(n_jobs=num_cores)(
-        delayed(read_ukb_scan_multimodal)(t1_files, t2_flair_files, i, resize=False) for i in
-        range(len(t2_flair_files)))
+        delayed(read_ukb_scan_multimodal)(t1_files, t2_flair_files, i, resize=False)
+        for i in range(len(t2_flair_files))
+    )
     print("done loading images, gathering them in one array now.")
     all_scans = list()
     for mm_scan in results:
@@ -59,7 +62,9 @@ def read_ukb_scan_multimodal(t1_files, t2_flair_files, i, resize):
         t1_scan = skTrans.resize(t1_scan, resolution3D, order=1, preserve_range=True)
     t2_flair_scan = read_scan(sbbox, np.load(t2_flair_files[i]), resize=resize)
     if not resize:
-        t2_flair_scan = skTrans.resize(t2_flair_scan, resolution3D, order=1, preserve_range=True)
+        t2_flair_scan = skTrans.resize(
+            t2_flair_scan, resolution3D, order=1, preserve_range=True
+        )
     return t1_scan, t2_flair_scan
 
 
@@ -104,9 +109,11 @@ def read_scan_find_bbox(image, resize, normalize=True):
 
 def read_scan(sbbox, image, resize, normalize=True):
     if normalize:
-        image = norm(image[sbbox[0]:sbbox[1], sbbox[2]:sbbox[3], sbbox[4]:sbbox[5]])
+        image = norm(
+            image[sbbox[0] : sbbox[1], sbbox[2] : sbbox[3], sbbox[4] : sbbox[5]]
+        )
     else:
-        image = image[sbbox[0]:sbbox[1], sbbox[2]:sbbox[3], sbbox[4]:sbbox[5]]
+        image = image[sbbox[0] : sbbox[1], sbbox[2] : sbbox[3], sbbox[4] : sbbox[5]]
     if resize:
         new_image = np.zeros((resolution2D[0], resolution2D[1], image.shape[2]))
         for z in range(image.shape[2]):
@@ -156,20 +163,31 @@ def _convert_to_example(image_buffer, height, width, depth=None):
     channels = 2
 
     if depth is not None:
-        example = tf.train.Example(features=tf.train.Features(feature={
-            'image/height': _int64_feature(height),
-            'image/width': _int64_feature(width),
-            'image/depth': _int64_feature(depth),
-            'image/channels': _int64_feature(channels),
-            'image/encoded': _float_feature(image_buffer)}))
+        example = tf.train.Example(
+            features=tf.train.Features(
+                feature={
+                    "image/height": _int64_feature(height),
+                    "image/width": _int64_feature(width),
+                    "image/depth": _int64_feature(depth),
+                    "image/channels": _int64_feature(channels),
+                    "image/encoded": _float_feature(image_buffer),
+                }
+            )
+        )
         return example
     else:
-        example = tf.train.Example(features=tf.train.Features(feature={
-            'image/height': _int64_feature(height),
-            'image/width': _int64_feature(width),
-            'image/channels': _int64_feature(channels),
-            'image/encoded': _float_feature(image_buffer)}))
+        example = tf.train.Example(
+            features=tf.train.Features(
+                feature={
+                    "image/height": _int64_feature(height),
+                    "image/width": _int64_feature(width),
+                    "image/channels": _int64_feature(channels),
+                    "image/encoded": _float_feature(image_buffer),
+                }
+            )
+        )
         return example
+
 
 if __name__ == "__main__":
     #################################
@@ -179,40 +197,45 @@ if __name__ == "__main__":
     output_tf_records_path = "/mnt/30T/ukbiobank/derived/imaging/brain_mri/tf_records/"
 
     t1_files = np.array(sorted(glob.glob(ukb_path + "/T1/**/*.npy", recursive=True)))
-    t2_flair_files = np.array(sorted(glob.glob(ukb_path + "/T2_FLAIR/**/*.npy", recursive=True)))
+    t2_flair_files = np.array(
+        sorted(glob.glob(ukb_path + "/T2_FLAIR/**/*.npy", recursive=True))
+    )
     num_files = t2_flair_files.shape[0]
 
     is3D = True
 
-    file_path_prefix = 'train'  # can be "validation"
+    file_path_prefix = "train"  # can be "validation"
     if is3D:
-        file_path_prefix += '_3D'
+        file_path_prefix += "_3D"
     verbose = True
 
     # Generate tfrecord writer
-    result_tf_file = output_tf_records_path + file_path_prefix + '.tfrecord'
+    result_tf_file = output_tf_records_path + file_path_prefix + ".tfrecord"
 
     if verbose:
         print("Serializing {:d} examples into {}".format(num_files, result_tf_file))
 
     # iterate over each sample, and serialize it as ProtoBuf.
     num_shards = int(num_files / SHARD_SIZE)
-    print('Total number of shards is ' + str(num_shards))
-    print('Expected number of files: ' + str(num_shards * SHARD_SIZE))
-
+    print("Total number of shards is " + str(num_shards))
+    print("Expected number of files: " + str(num_shards * SHARD_SIZE))
 
     def process_one_shard(shard):
         print("processing shard number %d *****" % shard)
         if is3D:
-            X = parallel_load_ukb_3D_multimodal(t1_files[(shard * SHARD_SIZE):((shard + 1) * SHARD_SIZE)],
-                                                t2_flair_files[(shard * SHARD_SIZE):((shard + 1) * SHARD_SIZE)])
+            X = parallel_load_ukb_3D_multimodal(
+                t1_files[(shard * SHARD_SIZE) : ((shard + 1) * SHARD_SIZE)],
+                t2_flair_files[(shard * SHARD_SIZE) : ((shard + 1) * SHARD_SIZE)],
+            )
         else:
-            X = parallel_load_ukb_multimodal(t1_files[(shard * SHARD_SIZE):((shard + 1) * SHARD_SIZE)],
-                                             t2_flair_files[(shard * SHARD_SIZE):((shard + 1) * SHARD_SIZE)])
+            X = parallel_load_ukb_multimodal(
+                t1_files[(shard * SHARD_SIZE) : ((shard + 1) * SHARD_SIZE)],
+                t2_flair_files[(shard * SHARD_SIZE) : ((shard + 1) * SHARD_SIZE)],
+            )
             np.random.shuffle(X)  # shuffling input dataset by rows
 
         print(X.shape)
-        output_filename = '%s-%.5d-of-%.5d' % (result_tf_file, shard, num_shards)
+        output_filename = "%s-%.5d-of-%.5d" % (result_tf_file, shard, num_shards)
         writer = tf.python_io.TFRecordWriter(output_filename)
         for idx in range(X.shape[0]):
             x = X[idx]
@@ -227,7 +250,6 @@ if __name__ == "__main__":
         del X
         if verbose:
             print("Writing {} done!".format(output_filename))
-
 
     for shard in range(num_shards - 1):
         process_one_shard(shard)

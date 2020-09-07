@@ -7,7 +7,9 @@ import scipy.ndimage as ndimage
 
 from self_supervised_3d_tasks.preprocessing.utils.crop import crop_3d
 from self_supervised_3d_tasks.preprocessing.utils.pad import pad_to_final_size_3d
-from self_supervised_3d_tasks.data.preproc_negative_sampling import NegativeSamplingPreprocessing
+from self_supervised_3d_tasks.data.preproc_negative_sampling import (
+    NegativeSamplingPreprocessing,
+)
 
 
 def augment_exemplar_2d(image):
@@ -20,6 +22,7 @@ def augment_exemplar_2d(image):
         ]
     )(image=image)["image"]
 
+
 def augment_exemplar_3d(image):
     # prob to apply transforms
     alpha = 0.5
@@ -31,7 +34,9 @@ def augment_exemplar_3d(image):
     def _distort_zoom(scan):
         scan_shape = scan.shape
         factor = 0.2
-        zoom_factors = [np.random.uniform(1 - factor, 1 + factor) for _ in range(scan.ndim - 1)] + [1]
+        zoom_factors = [
+            np.random.uniform(1 - factor, 1 + factor) for _ in range(scan.ndim - 1)
+        ] + [1]
         scan = ndimage.zoom(scan, zoom_factors, mode="constant")
         scan = pad_to_final_size_3d(scan, scan_shape[0])
         scan = crop_3d(scan, True, scan_shape)
@@ -64,21 +69,33 @@ def augment_exemplar_3d(image):
     # make rotation arbitrary instead of multiples of 90deg
     if np.random.rand() < alpha:
         if np.random.rand() < rotate_only_90:
-            processed_image = np.rot90(processed_image, k=np.random.randint(0, 4), axes=(0, 1))
+            processed_image = np.rot90(
+                processed_image, k=np.random.randint(0, 4), axes=(0, 1)
+            )
         else:
-            processed_image = ndimage.rotate(processed_image, np.random.uniform(0, 360), axes=(0, 1), reshape=False)
+            processed_image = ndimage.rotate(
+                processed_image, np.random.uniform(0, 360), axes=(0, 1), reshape=False
+            )
 
     if np.random.rand() < alpha:
         if np.random.rand() < rotate_only_90:
-            processed_image = np.rot90(processed_image, k=np.random.randint(0, 4), axes=(1, 2))
+            processed_image = np.rot90(
+                processed_image, k=np.random.randint(0, 4), axes=(1, 2)
+            )
         else:
-            processed_image = ndimage.rotate(processed_image, np.random.uniform(0, 360), axes=(1, 2), reshape=False)
+            processed_image = ndimage.rotate(
+                processed_image, np.random.uniform(0, 360), axes=(1, 2), reshape=False
+            )
 
     if np.random.rand() < alpha:
         if np.random.rand() < rotate_only_90:
-            processed_image = np.rot90(processed_image, k=np.random.randint(0, 4), axes=(0, 2))
+            processed_image = np.rot90(
+                processed_image, k=np.random.randint(0, 4), axes=(0, 2)
+            )
         else:
-            processed_image = ndimage.rotate(processed_image, np.random.uniform(0, 360), axes=(0, 2), reshape=False)
+            processed_image = ndimage.rotate(
+                processed_image, np.random.uniform(0, 360), axes=(0, 2), reshape=False
+            )
 
     if np.random.rand() < beta:
         # color distortion
@@ -136,9 +153,14 @@ def preprocessing_exemplar_training(x, y, process_3d):
         x_processed[i] = triplet.copy()
     return x_processed, y
 
-def get_exemplar_training_preprocessing(process_3d=False, sample_neg_examples_from="batch"):
+
+def get_exemplar_training_preprocessing(
+    process_3d=False, sample_neg_examples_from="batch"
+):
     if sample_neg_examples_from == "dataset":
-        pp_f = functools.partial(preprocessing_exemplar_training_neg_sampling, process_3d=process_3d)
+        pp_f = functools.partial(
+            preprocessing_exemplar_training_neg_sampling, process_3d=process_3d
+        )
         nsp = NegativeSamplingPreprocessing(pp_f)
         return nsp
     elif sample_neg_examples_from == "batch":

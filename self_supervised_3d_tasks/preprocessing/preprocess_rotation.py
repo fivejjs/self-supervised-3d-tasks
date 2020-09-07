@@ -19,7 +19,9 @@ def rotate_batch(x, y=None):
         # square the image
         if image.shape[0] != image.shape[1]:
             square_size = min(image.shape[0], image.shape[1])
-            image = ab.CenterCrop(height=square_size, width=square_size)(image=image)['image']
+            image = ab.CenterCrop(height=square_size, width=square_size)(image=image)[
+                "image"
+            ]
         # random transformation [0..3]
         rot = np.random.random_integers(4) - 1
         image = np.rot90(image, rot)
@@ -63,4 +65,6 @@ def rotate_batch_3d(x, y=None):
 
 
 def resize(batch, new_size):
-    return np.array([ab.Resize(new_size, new_size)(image=image)["image"] for image in batch])
+    return np.array(
+        [ab.Resize(new_size, new_size)(image=image)["image"] for image in batch]
+    )

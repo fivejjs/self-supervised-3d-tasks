@@ -5,8 +5,9 @@ from self_supervised_3d_tasks.data.generator_base import DataGeneratorBase
 
 
 class DataGeneratorUnlabeled3D(DataGeneratorBase):
-
-    def __init__(self, data_path, file_list, batch_size=32, shuffle=True, pre_proc_func=None):
+    def __init__(
+        self, data_path, file_list, batch_size=32, shuffle=True, pre_proc_func=None
+    ):
         self.path_to_data = data_path
 
         super().__init__(file_list, batch_size, shuffle, pre_proc_func)

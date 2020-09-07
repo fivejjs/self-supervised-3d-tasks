@@ -25,14 +25,14 @@ def upsample_simple(filters, kernel_size, strides, padding):
 
 
 def conv_block(
-        inputs,
-        use_batch_norm=True,
-        dropout=0.3,
-        filters=16,
-        kernel_size=(3, 3),
-        activation="relu",
-        kernel_initializer="he_normal",
-        padding="same",
+    inputs,
+    use_batch_norm=True,
+    dropout=0.3,
+    filters=16,
+    kernel_size=(3, 3),
+    activation="relu",
+    kernel_initializer="he_normal",
+    padding="same",
 ):
     c = Conv2D(
         filters,
@@ -58,13 +58,13 @@ def conv_block(
 
 
 def downconv_model(
-        input_shape,
-        use_batch_norm=True,
-        dropout=0.5,
-        dropout_change_per_layer=0.0,
-        filters=16,
-        num_layers=4,
-        pooling=None
+    input_shape,
+    use_batch_norm=True,
+    dropout=0.5,
+    dropout_change_per_layer=0.0,
+    filters=16,
+    num_layers=4,
+    pooling=None,
 ):
     inputs = Input(input_shape)
     x = inputs
@@ -93,16 +93,16 @@ def downconv_model(
 
 
 def upconv_model(
-        input_shape,
-        num_classes=3,
-        use_batch_norm=True,
-        upsample_mode="deconv",  # 'deconv' or 'simple'
-        use_dropout_on_upsampling=True,
-        dropout=0.5,
-        dropout_change_per_layer=0.0,
-        filters=128,
-        down_layers=(),
-        output_activation="softmax",  # 'sigmoid' or 'softmax'
+    input_shape,
+    num_classes=3,
+    use_batch_norm=True,
+    upsample_mode="deconv",  # 'deconv' or 'simple'
+    use_dropout_on_upsampling=True,
+    dropout=0.5,
+    dropout_change_per_layer=0.0,
+    filters=128,
+    down_layers=(),
+    output_activation="softmax",  # 'sigmoid' or 'softmax'
 ):
     inp = Input(input_shape)
     inputs = [inp]
@@ -131,16 +131,16 @@ def upconv_model(
 
 
 def custom_unet(
-        input_shape,
-        num_classes=1,
-        use_batch_norm=True,
-        upsample_mode="deconv",  # 'deconv' or 'simple'
-        use_dropout_on_upsampling=True,
-        dropout=0.3,
-        dropout_change_per_layer=0.0,
-        filters=16,
-        num_layers=4,
-        output_activation="sigmoid",  # 'sigmoid' or 'softmax'
+    input_shape,
+    num_classes=1,
+    use_batch_norm=True,
+    upsample_mode="deconv",  # 'deconv' or 'simple'
+    use_dropout_on_upsampling=True,
+    dropout=0.3,
+    dropout_change_per_layer=0.0,
+    filters=16,
+    num_layers=4,
+    output_activation="sigmoid",  # 'sigmoid' or 'softmax'
 ):
     downconv, data = downconv_model(
         input_shape,

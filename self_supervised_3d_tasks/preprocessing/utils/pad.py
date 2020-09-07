@@ -18,4 +18,6 @@ def pad_to_final_size_3d(volume, w):
 
 
 def pad_to_final_size_2d(image, w):
-    return ab.PadIfNeeded(w, w, border_mode=cv2.BORDER_CONSTANT, value=0)(image=image)["image"]
+    return ab.PadIfNeeded(w, w, border_mode=cv2.BORDER_CONSTANT, value=0)(image=image)[
+        "image"
+    ]

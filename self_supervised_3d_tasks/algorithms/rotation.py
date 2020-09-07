@@ -5,7 +5,8 @@ from self_supervised_3d_tasks.algorithms.algorithm_base import AlgorithmBuilderB
 from self_supervised_3d_tasks.utils.model_utils import (
     apply_encoder_model,
     apply_encoder_model_3d,
-    apply_prediction_model_to_encoder)
+    apply_prediction_model_to_encoder,
+)
 from self_supervised_3d_tasks.preprocessing.preprocess_rotation import (
     rotate_batch,
     rotate_batch_3d,
@@ -14,15 +15,17 @@ from self_supervised_3d_tasks.preprocessing.preprocess_rotation import (
 
 class RotationBuilder(AlgorithmBuilderBase):
     def __init__(
-            self,
-            data_dim=384,
-            number_channels=3,
-            lr=1e-4,
-            data_is_3D=False,
-            top_architecture="big_fully",
-            **kwargs
+        self,
+        data_dim=384,
+        number_channels=3,
+        lr=1e-4,
+        data_is_3D=False,
+        top_architecture="big_fully",
+        **kwargs
     ):
-        super(RotationBuilder, self).__init__(data_dim, number_channels, lr, data_is_3D, **kwargs)
+        super(RotationBuilder, self).__init__(
+            data_dim, number_channels, lr, data_is_3D, **kwargs
+        )
 
         self.image_size = data_dim
         self.img_shape = (self.image_size, self.image_size, number_channels)
@@ -50,7 +53,7 @@ class RotationBuilder(AlgorithmBuilderBase):
             self.enc_model,
             prediction_architecture=self.top_architecture,
             include_top=False,
-            model_on_top=x
+            model_on_top=x,
         )
 
     def get_training_model(self):
@@ -74,7 +77,6 @@ class RotationBuilder(AlgorithmBuilderBase):
             return f_3d, f_3d
         else:
             return f, f
-
 
     def purge(self):
         for i in reversed(range(len(self.cleanup_models))):

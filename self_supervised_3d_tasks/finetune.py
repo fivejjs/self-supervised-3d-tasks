@@ -14,18 +14,29 @@ from tensorflow.python.keras import Model
 from tensorflow.python.keras.callbacks import CSVLogger
 
 import self_supervised_3d_tasks.utils.metrics as metrics
-from self_supervised_3d_tasks.utils.callbacks import TerminateOnNaN, NaNLossError, LogCSVWithStart
-from self_supervised_3d_tasks.utils.metrics import weighted_sum_loss, jaccard_distance, \
-    weighted_categorical_crossentropy, weighted_dice_coefficient, weighted_dice_coefficient_loss, \
-    weighted_dice_coefficient_per_class, brats_wt_metric, brats_et_metric, brats_tc_metric
-from self_supervised_3d_tasks.test_data_backend import CvDataKaggle, StandardDataLoader
-from self_supervised_3d_tasks.train import (
-    keras_algorithm_list,
+from self_supervised_3d_tasks.utils.callbacks import (
+    TerminateOnNaN,
+    NaNLossError,
+    LogCSVWithStart,
 )
+from self_supervised_3d_tasks.utils.metrics import (
+    weighted_sum_loss,
+    jaccard_distance,
+    weighted_categorical_crossentropy,
+    weighted_dice_coefficient,
+    weighted_dice_coefficient_loss,
+    weighted_dice_coefficient_per_class,
+    brats_wt_metric,
+    brats_et_metric,
+    brats_tc_metric,
+)
+from self_supervised_3d_tasks.test_data_backend import CvDataKaggle, StandardDataLoader
+from self_supervised_3d_tasks.train import keras_algorithm_list
 from self_supervised_3d_tasks.utils.model_utils import (
     apply_prediction_model,
     get_writing_path,
-    print_flat_summary)
+    print_flat_summary,
+)
 from self_supervised_3d_tasks.utils.model_utils import init
 
 
@@ -75,13 +86,19 @@ def make_custom_metrics(metrics):
         metrics.remove("weighted_dice_coefficient_per_class_pancreas")
 
         def dice_class_0(y_true, y_pred):
-            return weighted_dice_coefficient_per_class(y_true, y_pred, class_to_predict=0)
+            return weighted_dice_coefficient_per_class(
+                y_true, y_pred, class_to_predict=0
+            )
 
         def dice_class_1(y_true, y_pred):
-            return weighted_dice_coefficient_per_class(y_true, y_pred, class_to_predict=1)
+            return weighted_dice_coefficient_per_class(
+                y_true, y_pred, class_to_predict=1
+            )
 
         def dice_class_2(y_true, y_pred):
-            return weighted_dice_coefficient_per_class(y_true, y_pred, class_to_predict=2)
+            return weighted_dice_coefficient_per_class(
+                y_true, y_pred, class_to_predict=2
+            )
 
         metrics.append(dice_class_0)
         metrics.append(dice_class_1)
@@ -117,9 +134,29 @@ def make_scores(y, y_pred, scores):
     return scores_f
 
 
-def run_single_test(algorithm_def, gen_train, gen_val, load_weights, freeze_weights, x_test, y_test, lr,
-                    batch_size, epochs, epochs_warmup, model_checkpoint, scores, loss, metrics, logging_path, kwargs,
-                    clipnorm=None, clipvalue=None, model_callback=None, working_dir=None):
+def run_single_test(
+    algorithm_def,
+    gen_train,
+    gen_val,
+    load_weights,
+    freeze_weights,
+    x_test,
+    y_test,
+    lr,
+    batch_size,
+    epochs,
+    epochs_warmup,
+    model_checkpoint,
+    scores,
+    loss,
+    metrics,
+    logging_path,
+    kwargs,
+    clipnorm=None,
+    clipvalue=None,
+    model_callback=None,
+    working_dir=None,
+):
     print(metrics)
     print(loss)
 
@@ -131,8 +168,11 @@ def run_single_test(algorithm_def, gen_train, gen_val, load_weights, freeze_weig
     else:
         enc_model = algorithm_def.get_finetuning_model()
 
-    pred_model = apply_prediction_model(input_shape=enc_model.outputs[0].shape[1:], algorithm_instance=algorithm_def,
-                                        **kwargs)
+    pred_model = apply_prediction_model(
+        input_shape=enc_model.outputs[0].shape[1:],
+        algorithm_instance=algorithm_def,
+        **kwargs,
+    )
 
     outputs = pred_model(enc_model.outputs)
     model = Model(inputs=enc_model.inputs[0], outputs=outputs)
@@ -146,7 +186,9 @@ def run_single_test(algorithm_def, gen_train, gen_val, load_weights, freeze_weig
             logging_csv = True
             logging_path.parent.mkdir(exist_ok=True, parents=True)
             logger_normal = CSVLogger(str(logging_path), append=False)
-            logger_after_warmup = LogCSVWithStart(str(logging_path), start_from_epoch=epochs_warmup, append=True)
+            logger_after_warmup = LogCSVWithStart(
+                str(logging_path), start_from_epoch=epochs_warmup, append=True
+            )
         if freeze_weights or load_weights:
             enc_model.trainable = False
 
@@ -166,7 +208,11 @@ def run_single_test(algorithm_def, gen_train, gen_val, load_weights, freeze_weig
             if logging_csv:
                 w_callbacks.append(logger_normal)
 
-            model.compile(optimizer=get_optimizer(clipnorm, clipvalue, lr), loss=loss, metrics=metrics)
+            model.compile(
+                optimizer=get_optimizer(clipnorm, clipvalue, lr),
+                loss=loss,
+                metrics=metrics,
+            )
             model.fit(
                 x=gen_train,
                 validation_data=gen_val,
@@ -187,21 +233,30 @@ def run_single_test(algorithm_def, gen_train, gen_val, load_weights, freeze_weig
 
         if working_dir is not None:
             save_checkpoint_every_n_epochs = 5
-            mc_c = tf.keras.callbacks.ModelCheckpoint(str(working_dir / "weights-improvement-{epoch:03d}.hdf5"),
-                                                      monitor="val_loss",
-                                                      mode="min", save_best_only=True)  # reduce storage space
-            mc_c_epochs = tf.keras.callbacks.ModelCheckpoint(str(working_dir / "weights-{epoch:03d}.hdf5"),
-                                                             period=save_checkpoint_every_n_epochs)  # reduce storage space
+            mc_c = tf.keras.callbacks.ModelCheckpoint(
+                str(working_dir / "weights-improvement-{epoch:03d}.hdf5"),
+                monitor="val_loss",
+                mode="min",
+                save_best_only=True,
+            )  # reduce storage space
+            mc_c_epochs = tf.keras.callbacks.ModelCheckpoint(
+                str(working_dir / "weights-{epoch:03d}.hdf5"),
+                period=save_checkpoint_every_n_epochs,
+            )  # reduce storage space
             callbacks.append(mc_c)
             callbacks.append(mc_c_epochs)
 
         # recompile model
-        model.compile(optimizer=get_optimizer(clipnorm, clipvalue, lr), loss=loss, metrics=metrics)
+        model.compile(
+            optimizer=get_optimizer(clipnorm, clipvalue, lr), loss=loss, metrics=metrics
+        )
         model.fit(
             x=gen_train, validation_data=gen_val, epochs=epochs, callbacks=callbacks
         )
 
-    model.compile(optimizer=get_optimizer(clipnorm, clipvalue, lr), loss=loss, metrics=metrics)
+    model.compile(
+        optimizer=get_optimizer(clipnorm, clipvalue, lr), loss=loss, metrics=metrics
+    )
     y_pred = model.predict(x_test, batch_size=batch_size)
     scores_f = make_scores(y_test, y_pred, scores)
 
@@ -238,7 +293,7 @@ class MaxTriesExceeded(Exception):
             self.max_tries = args[0]
 
     def __str__(self):
-        return f'Maximum amount of tries ({self.max_tries}) exceeded for {self.func}.'
+        return f"Maximum amount of tries ({self.max_tries}) exceeded for {self.func}."
 
 
 def try_until_no_nan(func, max_tries=4):
@@ -251,25 +306,25 @@ def try_until_no_nan(func, max_tries=4):
 
 
 def run_complex_test(
-        algorithm,
-        dataset_name,
-        root_config_file,
-        model_checkpoint,
-        epochs_initialized=5,
-        epochs_random=5,
-        epochs_frozen=5,
-        repetitions=2,
-        batch_size=8,
-        exp_splits=(100, 10, 1),
-        lr=1e-3,
-        epochs_warmup=2,
-        scores=("qw_kappa",),
-        loss="mse",
-        metrics=("mse",),
-        clipnorm=None,
-        clipvalue=None,
-        do_cross_val=False,
-        **kwargs,
+    algorithm,
+    dataset_name,
+    root_config_file,
+    model_checkpoint,
+    epochs_initialized=5,
+    epochs_random=5,
+    epochs_frozen=5,
+    repetitions=2,
+    batch_size=8,
+    exp_splits=(100, 10, 1),
+    lr=1e-3,
+    epochs_warmup=2,
+    scores=("qw_kappa",),
+    loss="mse",
+    metrics=("mse",),
+    clipnorm=None,
+    clipvalue=None,
+    do_cross_val=False,
+    **kwargs,
 ):
     model_checkpoint = expanduser(model_checkpoint)
     if os.path.isdir(model_checkpoint):
@@ -315,9 +370,13 @@ def run_complex_test(
     write_result(working_dir, header)
 
     if do_cross_val:
-        data_loader = CvDataKaggle(dataset_name, batch_size, algorithm_def, n_repetitions=repetitions, **kwargs)
+        data_loader = CvDataKaggle(
+            dataset_name, batch_size, algorithm_def, n_repetitions=repetitions, **kwargs
+        )
     else:
-        data_loader = StandardDataLoader(dataset_name, batch_size, algorithm_def, **kwargs)
+        data_loader = StandardDataLoader(
+            dataset_name, batch_size, algorithm_def, **kwargs
+        )
 
     for train_split in exp_splits:
         percentage = 0.01 * train_split
@@ -340,31 +399,89 @@ def run_complex_test(
             gen_train, gen_val, x_test, y_test = data_loader.get_dataset(i, percentage)
 
             if epochs_frozen > 0:
-                logging_a_path = logging_base_path / f"split{train_split}frozen_rep{i}.log"
+                logging_a_path = (
+                    logging_base_path / f"split{train_split}frozen_rep{i}.log"
+                )
                 a = try_until_no_nan(
-                    lambda: run_single_test(algorithm_def, gen_train, gen_val, True, True, x_test, y_test, lr,
-                                            batch_size, epochs_frozen, epochs_warmup, model_checkpoint, scores, loss,
-                                            metrics,
-                                            logging_a_path,
-                                            kwargs, clipnorm=clipnorm, clipvalue=clipvalue))  # frozen
+                    lambda: run_single_test(
+                        algorithm_def,
+                        gen_train,
+                        gen_val,
+                        True,
+                        True,
+                        x_test,
+                        y_test,
+                        lr,
+                        batch_size,
+                        epochs_frozen,
+                        epochs_warmup,
+                        model_checkpoint,
+                        scores,
+                        loss,
+                        metrics,
+                        logging_a_path,
+                        kwargs,
+                        clipnorm=clipnorm,
+                        clipvalue=clipvalue,
+                    )
+                )  # frozen
                 a_s.append(a)
             if epochs_initialized > 0:
-                logging_b_path = logging_base_path / f"split{train_split}initialized_rep{i}.log"
+                logging_b_path = (
+                    logging_base_path / f"split{train_split}initialized_rep{i}.log"
+                )
                 b = try_until_no_nan(
-                    lambda: run_single_test(algorithm_def, gen_train, gen_val, True, False, x_test, y_test, lr,
-                                            batch_size, epochs_initialized, epochs_warmup, model_checkpoint, scores,
-                                            loss, metrics,
-                                            logging_b_path, kwargs, clipnorm=clipnorm, clipvalue=clipvalue))
+                    lambda: run_single_test(
+                        algorithm_def,
+                        gen_train,
+                        gen_val,
+                        True,
+                        False,
+                        x_test,
+                        y_test,
+                        lr,
+                        batch_size,
+                        epochs_initialized,
+                        epochs_warmup,
+                        model_checkpoint,
+                        scores,
+                        loss,
+                        metrics,
+                        logging_b_path,
+                        kwargs,
+                        clipnorm=clipnorm,
+                        clipvalue=clipvalue,
+                    )
+                )
                 b_s.append(b)
             if epochs_random > 0:
-                logging_c_path = logging_base_path / f"split{train_split}random_rep{i}.log"
+                logging_c_path = (
+                    logging_base_path / f"split{train_split}random_rep{i}.log"
+                )
                 c = try_until_no_nan(
-                    lambda: run_single_test(algorithm_def, gen_train, gen_val, False, False, x_test, y_test, lr,
-                                            batch_size, epochs_random, epochs_warmup, model_checkpoint, scores, loss,
-                                            metrics,
-                                            logging_c_path,
-                                            kwargs, clipnorm=clipnorm, clipvalue=clipvalue,
-                                            working_dir=working_dir))  # random
+                    lambda: run_single_test(
+                        algorithm_def,
+                        gen_train,
+                        gen_val,
+                        False,
+                        False,
+                        x_test,
+                        y_test,
+                        lr,
+                        batch_size,
+                        epochs_random,
+                        epochs_warmup,
+                        model_checkpoint,
+                        scores,
+                        loss,
+                        metrics,
+                        logging_c_path,
+                        kwargs,
+                        clipnorm=clipnorm,
+                        clipvalue=clipvalue,
+                        working_dir=working_dir,
+                    )
+                )  # random
                 c_s.append(c)
 
         def get_avg_score(list_abc, index):
