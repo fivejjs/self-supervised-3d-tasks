@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-from tensorflow.keras.models import Model
 from tensorflow.keras.layers import (
     AveragePooling2D,
     BatchNormalization,
@@ -13,6 +12,7 @@ from tensorflow.keras.layers import (
     Input,
     concatenate,
 )
+from tensorflow.keras.models import Model
 from tensorflow.keras.utils import plot_model
 
 

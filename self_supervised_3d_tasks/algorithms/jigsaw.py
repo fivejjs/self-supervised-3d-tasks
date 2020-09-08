@@ -10,8 +10,6 @@ from self_supervised_3d_tasks.utils.model_utils import (
     load_permutations,
     load_permutations_3d,
     apply_prediction_model,
-    make_finetuning_encoder_3d,
-    make_finetuning_encoder_2d,
 )
 
 

@@ -1,5 +1,4 @@
 from tensorflow.keras.layers import BatchNormalization, Dropout, Dense
-from tensorflow.python.keras.layers import GlobalAveragePooling2D
 
 
 def fully_connected(inputs, num_classes=100, rate=0.5, include_top=True):

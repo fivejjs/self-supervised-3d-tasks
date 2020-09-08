@@ -1,10 +1,9 @@
+import sys
 from functools import partial
+from multiprocessing import Pool
+from pathlib import Path
 
 from PIL import Image
-from pathlib import Path
-import sys
-
-from multiprocessing import Pool
 
 
 def resize_one(path, size=(384, 384), output_dir="resized", callback=None):

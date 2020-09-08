@@ -1,3 +1,5 @@
+import tensorflow.keras.backend as K
+from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.layers import (
     Input,
     Add,
@@ -11,11 +13,7 @@ from tensorflow.keras.layers import (
     MaxPooling2D,
 )
 from tensorflow.keras.models import Model
-
-from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.optimizers import Adam
-
-import tensorflow.keras.backend as K
 
 K.set_image_data_format("channels_last")
 K.set_learning_phase(1)

@@ -1,5 +1,5 @@
-from tensorflow.python.keras.callbacks import Callback, CSVLogger
 import numpy as np
+from tensorflow.python.keras.callbacks import Callback, CSVLogger
 
 
 class NaNLossError(Exception):

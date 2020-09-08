@@ -1,5 +1,4 @@
 import numpy as np
-import albumentations as ab
 
 
 def crop_patches_3d(image, is_training, patches_per_side, patch_jitter=0):

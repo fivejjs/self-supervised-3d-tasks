@@ -1,10 +1,10 @@
 import glob
 import os
+import traceback
 import zipfile
 
 import nibabel as nib
 import numpy as np
-import traceback
 
 
 def norm(im):

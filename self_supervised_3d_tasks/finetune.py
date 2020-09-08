@@ -14,6 +14,8 @@ from tensorflow.python.keras import Model
 from tensorflow.python.keras.callbacks import CSVLogger
 
 import self_supervised_3d_tasks.utils.metrics as metrics
+from self_supervised_3d_tasks.test_data_backend import CvDataKaggle, StandardDataLoader
+from self_supervised_3d_tasks.train import keras_algorithm_list
 from self_supervised_3d_tasks.utils.callbacks import (
     TerminateOnNaN,
     NaNLossError,
@@ -30,8 +32,6 @@ from self_supervised_3d_tasks.utils.metrics import (
     brats_et_metric,
     brats_tc_metric,
 )
-from self_supervised_3d_tasks.test_data_backend import CvDataKaggle, StandardDataLoader
-from self_supervised_3d_tasks.train import keras_algorithm_list
 from self_supervised_3d_tasks.utils.model_utils import (
     apply_prediction_model,
     get_writing_path,

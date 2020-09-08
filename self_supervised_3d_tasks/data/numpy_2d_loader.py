@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from self_supervised_3d_tasks.data.generator_base import DataGeneratorBase
 import numpy as np
+
+from self_supervised_3d_tasks.data.generator_base import DataGeneratorBase
 
 
 class Numpy2DLoader(DataGeneratorBase):

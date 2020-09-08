@@ -4,27 +4,37 @@
   "data_dir_test": "/mnt/projects/ukbiobank/derived/imaging/brain_mri/images_resized_128_labeled/test",
   "dataset_name": "ukb3d",
   "model_checkpoint": "~/workspace/random",
-  "train_data_generator_args": { "label_stem": "", "shuffle": true},
-  "val_data_generator_args": {"label_stem": ""},
-  "test_data_generator_args": {"label_stem": ""},
-
+  "train_data_generator_args": {
+    "label_stem": "",
+    "shuffle": true
+  },
+  "val_data_generator_args": {
+    "label_stem": ""
+  },
+  "test_data_generator_args": {
+    "label_stem": ""
+  },
   "data_is_3D": true,
   "val_split": 0.05,
-
   "enc_filters": 16,
   "data_dim": 128,
-
   "loss": "weighted_dice_loss",
-  "scores": ["dice", "jaccard"],
-  "metrics": ["accuracy", "weighted_dice_coefficient"],
-
+  "scores": [
+    "dice",
+    "jaccard"
+  ],
+  "metrics": [
+    "accuracy",
+    "weighted_dice_coefficient"
+  ],
   "prediction_architecture": "unet_3d_upconv",
   "pooling": "max",
   "number_channels": 2,
   "num_classes": 4,
   "batch_size": 8,
-
-  "exp_splits": [100],
+  "exp_splits": [
+    100
+  ],
   "lr": 1e-3,
   "epochs_initialized": 0,
   "epochs_frozen": 0,

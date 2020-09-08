@@ -1,11 +1,10 @@
 import json
-from pathlib import Path
-import pandas
-import glob
-import matplotlib.pyplot as plt
-import matplotlib.markers as markers
-import numpy as np
 from math import inf
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas
 
 
 def get_brats_data():

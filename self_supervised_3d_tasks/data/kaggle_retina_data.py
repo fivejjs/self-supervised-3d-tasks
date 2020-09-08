@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import albumentations as ab
-import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image

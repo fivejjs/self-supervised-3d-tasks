@@ -1,7 +1,8 @@
-from PIL import Image
-import numpy as np
-from tensorflow.python.keras.preprocessing.image import random_zoom
 import albumentations as ab
+import numpy as np
+from PIL import Image
+from tensorflow.python.keras.preprocessing.image import random_zoom
+
 from self_supervised_3d_tasks.data.generator_base import DataGeneratorBase
 
 

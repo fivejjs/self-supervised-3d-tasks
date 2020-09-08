@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+
 from self_supervised_3d_tasks.data.generator_base import DataGeneratorBase
 
 

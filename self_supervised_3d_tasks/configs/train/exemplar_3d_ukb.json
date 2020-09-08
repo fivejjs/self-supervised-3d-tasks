@@ -3,17 +3,13 @@
   "data_dir": "/mnt/projects/ukbiobank/derived/imaging/brain_mri/images_resized_128_labeled/train/",
   "dataset_name": "ukb3d",
   "sample_neg_examples_from": "dataset",
-
   "data_is_3D": true,
-
   "code_size": 1024,
   "enc_filters": 16,
   "data_dim": 128,
-
   "top_architecture": "big_fully",
   "number_channels": 2,
   "batch_size": 2,
-
   "lr": 1e-4,
   "epochs": 1000
 }

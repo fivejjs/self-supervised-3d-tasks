@@ -1,5 +1,6 @@
-import numpy as np
 import random
+
+import numpy as np
 import tensorflow.keras as keras
 
 from self_supervised_3d_tasks.data.preproc_negative_sampling import (

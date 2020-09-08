@@ -4,13 +4,13 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.python.keras.layers import Reshape, Dense
 
 from self_supervised_3d_tasks.algorithms.algorithm_base import AlgorithmBuilderBase
+from self_supervised_3d_tasks.preprocessing.preprocess_exemplar import (
+    get_exemplar_training_preprocessing,
+)
+from self_supervised_3d_tasks.utils.metrics import triplet_loss
 from self_supervised_3d_tasks.utils.model_utils import (
     apply_encoder_model_3d,
     apply_encoder_model,
-)
-from self_supervised_3d_tasks.utils.metrics import triplet_loss
-from self_supervised_3d_tasks.preprocessing.preprocess_exemplar import (
-    get_exemplar_training_preprocessing,
 )
 
 

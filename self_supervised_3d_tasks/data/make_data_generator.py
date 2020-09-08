@@ -1,10 +1,6 @@
 import os
 import random
 
-from self_supervised_3d_tasks.data.segmentation_task_loader import (
-    SegmentationGenerator3D,
-)
-
 
 def get_data_generators_internal(
     data_path,

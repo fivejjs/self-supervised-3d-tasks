@@ -1,3 +1,5 @@
+import numpy as np
+
 from self_supervised_3d_tasks.data.kaggle_retina_data import (
     get_kaggle_generator,
     get_kaggle_cross_validation,
@@ -7,7 +9,6 @@ from self_supervised_3d_tasks.data.numpy_2d_loader import Numpy2DLoader
 from self_supervised_3d_tasks.data.segmentation_task_loader import (
     SegmentationGenerator3D,
 )
-import numpy as np
 
 
 def get_dataset_regular_train(
